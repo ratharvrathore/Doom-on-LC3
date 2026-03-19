@@ -28,11 +28,12 @@ module cpu (
 );
 
     wire [1:0] ALUControl, ExtByHowMuch;
-    wire RegWrite, SR2Mux, DRMux, RegWriteMux, SRPCMux, ImmSR2Mux, JMPMux;
+    wire RegWrite, SR2Mux, DRMux, RegWriteMux, SRPCMux, BrMux, ImmSR2Mux, JMPMux;
 
     controller controller(
         .instruction(instruction),
         .clk(clk),
+        .reset(reset),
         .ALUControl(ALUControl),
         .ExtByHowMuch(ExtByHowMuch),
         .RegWrite(RegWrite),
@@ -42,12 +43,14 @@ module cpu (
         .DRMux(DRMux),
         .RegWriteMux(RegWriteMux),
         .SRPCMux(SRPCMux),
+        .BrMux(BrMux),
         .ImmSR2Mux(ImmSR2Mux),
-        .JMPMux(JMPMux),
+        .JMPMux(JMPMux)
     );
 
     datapath datapath(
         .clk(clk),
+        .reset(reset),
         .instruction(instruction),
         .rams_output(memory_data),
         .ALUControl(ALUControl),
@@ -58,6 +61,7 @@ module cpu (
         .DRMux(DRMux),
         .RegWriteMux(RegWriteMux),
         .SRPCMux(SRPCMux),
+        .BrMux(BrMux),
         .ImmSR2Mux(ImmSR2Mux),
         .JMPMux(JMPMux),
         .ram_address(ram_address),

@@ -4,6 +4,7 @@
 module controller (
     input wire [15:0] instruction,
     input wire clk,
+    input wire reset,
 
     output reg  [1:0] ALUControl,
     output reg  [1:0] ExtByHowMuch,
@@ -37,19 +38,20 @@ module controller (
             4'b0100: ExtByHowMuch = 2'b11; // 11 to 16
             4'b??01: ExtByHowMuch = 2'b00; // 5 to 16
             4'b011?: ExtByHowMuch = 2'b01; // 6 to 16
+            4'b1100: ExtByHowMuch = 2'b01; // 6 to 16
             default: ExtByHowMuch = 2'b10; // 9 to 16
         endcase
     end
 
     // RegWrite
-    assign RegWrite = opcode[0] ^ opcode[1];
+    assign RegWrite = (opcode[0] ^ opcode[1] ^ opcode[2]);
 
     // RAM controls
     assign PtrToPtr   = opcode[3];
     assign WriteEnable = ~(opcode[3] & opcode[2]) & (opcode[1] & opcode[0]);
 
     // SR2Mux
-    assign SR2Mux = ~opcode[3] & opcode[2] & opcode[1] & opcode[0];
+    assign SR2Mux = ~opcode[2] & opcode[0];
 
     // DRMux
     assign DRMux = ~opcode[3] & opcode[2] & ~opcode[1] & ~opcode[0];
@@ -58,15 +60,18 @@ module controller (
     assign RegWriteMux = ~(opcode[3] & opcode[2]) & (opcode[1] & ~opcode[0]);
 
     // SRPCMux
-    assign SRPCMux = opcode[0] & ~opcode[1];
+    assign SRPCMux = ((~opcode[1] & opcode[0]) & (~opcode[3] | ~opcode[2])) |
+                     ((~opcode[3] & opcode[2] & opcode[1])) | (opcode[3] & opcode[2] & ~opcode[1]) |
+                     (opcode[2] & ~opcode[1] & ~opcode[0] & ~(opcode[3] | instruction[11]));//help
 
     // Branch Mux
     assign BrMux = ~opcode[3] & ~opcode[2] & ~opcode[1] & ~opcode[0];
 
     // Immediate vs SR2 Mux
-    assign ImmSR2Mux = opcode[0] & ~opcode[1] & ~instruction[5];
+    assign ImmSR2Mux = (opcode[0] & ~opcode[1] & ~instruction[5]);
 
     // JMP Mux
-    assign JMPMux = ~opcode[0] & ~opcode[1];
+    assign JMPMux = reset ? 1'b0 :
+                (~opcode[0] & ~opcode[1]);
 
 endmodule

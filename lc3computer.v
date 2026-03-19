@@ -6,10 +6,11 @@
 //		RAM equivalent
 
 module lc3computer (
-    input wire clk
+    input wire clk,
+    input wire reset
 );
     wire [15:0] instruction, memory_data, ram_address, input_word_to_ram, PC;
-    wire reset, PtrToPtr, WriteEnable;
+    wire PtrToPtr, WriteEnable;
 
     cpu cpu1(
         .instruction(instruction),
@@ -34,6 +35,7 @@ module lc3computer (
     );
 
     instruction_decoder instruction_decoder(
+        .clk(clk),
         .instruction_address(PC),
         .instruction(instruction)
     );

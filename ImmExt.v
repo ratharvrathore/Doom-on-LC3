@@ -13,7 +13,7 @@ module ImmExt (
 
     assign result =
         (ExtByHowMuch == 2'b00) ? {{11{data[4]}}, data[4:0]} :
-        (ExtByHowMuch == 2'b01) ? {{10{data[8]}}, data[5:0]} :
+        (ExtByHowMuch == 2'b01) ? {{10{data[5]}}, data[5:0]} :
         (ExtByHowMuch == 2'b10) ? {{7{data[8]}}, data[8:0]} :
         (ExtByHowMuch == 2'b11) ? {{5{data[10]}}, data[10:0]} : 16'd0;
 endmodule
